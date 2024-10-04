@@ -1,0 +1,112 @@
+C51 COMPILER V9.60.7.0   KEY                                                               09/25/2024 12:40:42 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE KEY
+OBJECT MODULE PLACED IN .\Objects\key.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE key.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\key.l
+                    -st) TABS(2) OBJECT(.\Objects\key.obj)
+
+line level    source
+
+   1          # include <reg51.h>
+   2          # include "lcd.h"
+   3          # include "key.h"
+   4          # include "ADC.h"
+   5          
+   6          sbit k1 = P3^1;   //Increment
+   7          sbit k2 = P3^0;  
+   8          sbit PWM_PIN= P2^1;
+   9          unsigned int  ON_Period, OFF_Period;
+  10          unsigned int DutyCycle;
+  11          unsigned int DutyCycle_Limit ;
+  12          
+  13          //PWM Setup
+  14          void Timer0_Intilization ()                    //8 Bit auto reload timmer Intilization
+  15          {
+  16   1        TMOD =0x02;
+  17   1        TH0=0x17;
+  18   1        //TL0=0xFD;
+  19   1        TR0=1;
+  20   1        IE=0x82;
+  21   1          
+  22   1      }
+  23          
+  24          void Timer0 () interrupt 1                 //8 Bit auto reload timmer 0 Intilization
+  25          { 
+  26   1        PWM_PIN = ~PWM_PIN ;  
+  27   1        if(PWM_PIN==1)
+  28   1           {
+  29   2             //TH0=ON_Period >> 8;
+  30   2             TL0=ON_Period;
+  31   2           }
+  32   1           else
+  33   1           {
+  34   2          //   TH0=OFF_Period>> 8;
+  35   2             TL0=OFF_Period;
+  36   2           }  
+  37   1      }
+  38          
+  39          void Set_Duty_Cycle (float duty_cycle)
+  40          {  
+  41   1        unsigned int Period;
+  42   1        Period =255 - 0x17 ;
+  43   1        ON_Period =((Period/100.0)*duty_cycle);
+  44   1        OFF_Period = Period -ON_Period;
+  45   1        ON_Period =  255-ON_Period;
+  46   1        OFF_Period=  255-OFF_Period;
+  47   1        
+  48   1      
+  49   1      }
+  50          
+  51          
+  52          void External_Keys()                      //External Interrupt Function
+  53          {  
+  54   1      if(k1==0)                                 //External Interupt for Increment 
+C51 COMPILER V9.60.7.0   KEY                                                               09/25/2024 12:40:42 PAGE 2   
+
+  55   1            { Delay(1000);                  //Debouncing Delay
+  56   2              
+  57   2              if(DutyCycle_Limit<100)           //Duty Cycle limit lessthan 100                    
+  58   2              { 
+  59   3                DutyCycle_Limit +=10;          //increment by 10
+  60   3                LCD_ShowNum(1,10,DutyCycle_Limit,3);   //Print on LCD
+  61   3                LCD_ShowString(1,13,".00");
+  62   3            
+  63   3                 Delay(500);
+  64   3              }     
+  65   2              
+  66   2              while (k1 == 0);                  //Remain in this state until Button prss 
+  67   2           }
+  68   1            
+  69   1           if(k2==0)                            //External Interrupt for decrement 
+  70   1            {     
+  71   2              Delay(100);                       //Debouncing Delay 
+  72   2                      
+  73   2              if(DutyCycle_Limit>0)             //if Duty Cycle is less than 0
+  74   2                 {  
+  75   3                 DutyCycle_Limit-=10;           //then decremnt by 10
+  76   3                 LCD_ShowNum(1,10,DutyCycle_Limit,3);    //and Print  on LCD
+  77   3                 LCD_ShowString(1,13,".00");
+  78   3                 Delay(500);
+  79   3                 }    
+  80   2              while (k2 == 0);                  //Remain in this state until Button prss 
+  81   2            }
+  82   1            
+  83   1              Set_Duty_Cycle(DutyCycle_Limit);    //Pass the Duty Cycle 
+  84   1              Delay(500);
+  85   1      }
+  86            
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    268    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,301 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:12:37 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          # include <reg51.h>
+   2          # include "lcd.h"
+   3          # include "adc.h"
+   4          
+   5          sbit PWM_PIN= P2^1;
+   6          unsigned int  ON_Period, OFF_Period;
+   7          unsigned int DutyCycle;
+   8          
+   9          sbit C1=P1^3;
+  10          sbit C2=P1^2;
+  11          sbit C3=P1^1;
+  12          sbit C4=P1^0;
+  13                                                                        
+  14          sbit R1=P1^7;
+  15          sbit R2=P1^6;
+  16          sbit R3=P1^5;
+  17          sbit R4=P1^4;
+  18               
+  19          
+  20          //PWM SETUP
+  21          void Timer0_Intilization ()
+  22          {
+  23   1        TMOD =0x02;
+  24   1        TH0=0x17;
+  25   1        TR0=1;
+  26   1        IE=0x82;
+  27   1      
+  28   1      }
+  29          
+  30          void Timer0 () interrupt 1
+  31          { 
+  32   1        PWM_PIN = ~PWM_PIN ;  
+  33   1        if(PWM_PIN)
+  34   1           {
+  35   2            TH0=ON_Period >> 8;
+  36   2             TL0=ON_Period;
+  37   2           }
+  38   1           else
+  39   1           {
+  40   2             TH0=OFF_Period >> 8;
+  41   2             TL0=OFF_Period;
+  42   2           }  
+  43   1      }
+  44          
+  45          
+  46          
+  47          void Set_Duty_Cycle (float duty_cycle)
+  48          {  
+  49   1        unsigned int Period;
+  50   1        Period =255 - 0x17 ;
+  51   1        ON_Period =((Period/100.0)*duty_cycle);
+  52   1        OFF_Period = Period -ON_Period;
+  53   1        ON_Period =  255-ON_Period;
+  54   1        OFF_Period=  255-OFF_Period;
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:12:37 PAGE 2   
+
+  55   1        
+  56   1      
+  57   1      }
+  58          
+  59          
+  60          //Keypad
+  61          
+  62          char Key_Pressed()
+  63          {
+  64   1          char key;
+  65   1          char prev_key;
+  66   1      
+  67   1          while (1)
+  68   1          {
+  69   2              key = 0;
+  70   2      
+  71   2              R1 = 0; R2 = 1; R3 = 1; R4 = 1; // Ground Row 1 and check column
+  72   2              if (C1 == 0)
+  73   2              {
+  74   3                  key = '7';
+  75   3              }
+  76   2              else if (C2 == 0)
+  77   2              {
+  78   3                  key = '8';
+  79   3              }
+  80   2              else if (C3 == 0)
+  81   2              {
+  82   3                  key = '9';
+  83   3              }
+  84   2              else if (C4 == 0)
+  85   2              {
+  86   3                  key = '/';
+  87   3              }
+  88   2      
+  89   2              R1 = 1; R2 = 0; R3 = 1; R4 = 1; // Ground Row 2 and check column
+  90   2              if (C1 == 0)
+  91   2              {
+  92   3                  key = '4';
+  93   3              }
+  94   2              else if (C2 == 0)
+  95   2              {
+  96   3                  key = '5';
+  97   3              }
+  98   2              else if (C3 == 0)
+  99   2              {
+ 100   3                  key = '6';
+ 101   3              }
+ 102   2              else if (C4 == 0)
+ 103   2              {
+ 104   3                  key = '.';
+ 105   3              }
+ 106   2      
+ 107   2              R1 = 1; R2 = 1; R3 = 0; R4 = 1; // Ground Row 3 and check column
+ 108   2              if (C1 == 0)
+ 109   2              {
+ 110   3                  key = '1';
+ 111   3              }
+ 112   2              else if (C2 == 0)
+ 113   2              {
+ 114   3                  key = '2';
+ 115   3              }
+ 116   2              else if (C3 == 0)
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:12:37 PAGE 3   
+
+ 117   2              {
+ 118   3                  key = '3';
+ 119   3              }
+ 120   2              else if (C4 == 0)
+ 121   2              {
+ 122   3                  key = '-';
+ 123   3              }
+ 124   2      
+ 125   2              R1 = 1; R2 = 1; R3 = 1; R4 = 0;
+ 126   2                if(C1==0)
+ 127   2             { 
+ 128   3                  Delay(10); 
+ 129   3      
+ 130   3                  LCD_Command(0x01);  // Clear the LCD screen
+ 131   3                  Delay(10);  // Add appropriate delay after LCD command
+ 132   3      
+ 133   3                   LCD_Command(0x80);  // Set cursor to the first line
+ 134   3                  Delay(10);  // Add appropriate delay after LCD command
+ 135   3      
+ 136   3                  String_data("DutyCycle");  // Display your desired text
+ 137   3                  Delay(10);  
+ 138   3               
+ 139   3                  LCD_Command(0xC0);  // Set cursor to the first line
+ 140   3                  Delay(10);  
+ 141   3      
+ 142   3                  String_data("Voltage:");  // Display your desired text
+ 143   3                  Delay(10);  
+ 144   3                  
+ 145   3               Delay(10000);
+ 146   3               
+ 147   3               } 
+ 148   2              else if (C2 == 0)
+ 149   2              {
+ 150   3                  key = '0';
+ 151   3              }
+ 152   2              else if (C3 == 0)
+ 153   2              {
+ 154   3                  key = '=';
+ 155   3              }
+ 156   2              else if (C4 == 0)
+ 157   2              {
+ 158   3                  key = '+';
+ 159   3              }
+ 160   2      
+ 161   2              if (key && key != prev_key)
+ 162   2              {
+ 163   3                  Delay(10000); // Debounce delay
+ 164   3                  while (C1 == 0 || C2 == 0 || C3 == 0 || C4 == 0)
+ 165   3                  {
+ 166   4                      //Beep(250);
+ 167   4                  }
+ 168   3      
+ 169   3                  prev_key = key;
+ 170   3                  return key;
+ 171   3              }
+ 172   2          }
+ 173   1      }
+ 174          
+ 175          //Floating point Number
+ 176          
+ 177          float GetFloatFromKeypad()
+ 178          {
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:12:37 PAGE 4   
+
+ 179   1          char input[10];
+ 180   1          int j,i = 0;
+ 181   1          int decimalEntered = 0;
+ 182   1          int decimalPlace = 0;
+ 183   1          float decimal ;
+ 184   1          float num ;
+ 185   1          int integerPart;
+ 186   1          int decimalPart,digit ;
+ 187   1          while (1)
+ 188   1          {
+ 189   2              char pressedKey = Key_Pressed(); // Function to detect the pressed button
+ 190   2      
+ 191   2              if (pressedKey == '=')
+ 192   2                  break;
+ 193   2              else if (pressedKey == '.' && i > 0 && !decimalEntered)
+ 194   2              {
+ 195   3                  input[i++] = pressedKey;
+ 196   3                  decimalEntered = 1;
+ 197   3                  LCD_ShowChar(1, 11 + i, pressedKey); // Display the decimal point on the LCD
+ 198   3              }
+ 199   2              else if (pressedKey >= '0' && pressedKey <= '9')
+ 200   2              {
+ 201   3                  if (i < 10)
+ 202   3                  {
+ 203   4                      input[i++] = pressedKey;
+ 204   4                      LCD_ShowChar(1, 11 + i, pressedKey); // Display the entered digit on the LCD
+ 205   4                  }
+ 206   3              }
+ 207   2          }
+ 208   1      
+ 209   1          input[i] = '\0';
+ 210   1      
+ 211   1          num = 0.0;
+ 212   1          decimal = 0.1;
+ 213   1      
+ 214   1           integerPart = 0;
+ 215   1           decimalPart = 0;
+ 216   1      
+ 217   1          for (j = 0; j < i; j++)
+ 218   1      {
+ 219   2          if (input[j] == '.')
+ 220   2          {
+ 221   3              decimalPlace = 1;
+ 222   3          }
+ 223   2          else
+ 224   2          {
+ 225   3              digit = input[j] - '0';
+ 226   3              if (!decimalPlace)
+ 227   3              {
+ 228   4                  integerPart = integerPart * 10 + digit;
+ 229   4              }
+ 230   3              else
+ 231   3              {
+ 232   4                  decimalPart = decimalPart * 10 + digit;
+ 233   4                  decimalPlace *= 0.1;
+ 234   4              }
+ 235   3          }
+ 236   2      }
+ 237   1      
+ 238   1          num = integerPart + decimal * decimalPart;
+ 239   1          return num;
+ 240   1      }
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:12:37 PAGE 5   
+
+ 241          void main(void)                  //Main Body                
+ 242          {   
+ 243   1          float num1;
+ 244   1          LCD_Intialization();               
+ 245   1          Timer0_Intilization();             
+ 246   1          R3 = 0;                             
+ 247   1          LCD_ShowString(1,0,"DutyCycle:");   
+ 248   1          LCD_ShowString(2,0,"Voltage:");
+ 249   1        
+ 250   1         while(1)
+ 251   1           {  
+ 252   2              num1 = GetFloatFromKeypad();       
+ 253   2             
+ 254   2              if (num1 >= 0.0 && num1 <= 5.0)     
+ 255   2              {  LCD_ShowFloat(num1, 1);
+ 256   3                  DutyCycle = num1;
+ 257   3                  Set_Duty_Cycle((DutyCycle * 100.0) / 5.0);  
+ 258   3                  Delay(1000);
+ 259   3                  DAC_VOLTAGE ();                      
+ 260   3                  Delay(500);
+ 261   3              }
+ 262   2              else                                
+ 263   2              {
+ 264   3                  Set_cursor(1, 0);
+ 265   3                  String_data("Invalid Number");     
+ 266   3              }
+ 267   2              
+ 268   2          }
+ 269   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    940    ----
+   CONSTANT SIZE    =     45    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6      43
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

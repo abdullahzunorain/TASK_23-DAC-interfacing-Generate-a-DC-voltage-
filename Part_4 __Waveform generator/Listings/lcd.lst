@@ -1,0 +1,231 @@
+C51 COMPILER V9.60.7.0   LCD                                                               09/24/2024 15:22:31 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LCD
+OBJECT MODULE PLACED IN .\Objects\lcd.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lcd.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lcd.l
+                    -st) TABS(2) OBJECT(.\Objects\lcd.obj)
+
+line level    source
+
+   1          //# include <reg52.h>
+   2          //# include "lcd.h"
+   3          
+   4          
+   5          ///***********************************************************************/
+   6          //#define LCD_DATAPORT P0                           //Data Port P0
+   7          //sbit RW=P2^5;                                     //Read/Write Pin
+   8          //sbit RS=P2^6;                                     //Register select (Command or Data Register)
+   9          //sbit EN=P2^7;                                     //Enable Pin to latch Data
+  10          
+  11          //sbit DB4=P0^4;                               
+  12          //sbit DB5=P0^5;
+  13          //sbit DB6=P0^6;
+  14          //sbit DB7=P0^7;
+  15          
+  16          //void Delay (unsigned int value)        // 1ms * Value = X Delay
+  17          //{
+  18          // unsigned int j;
+  19          //     
+  20          //  for (j=0; j<value ;j++)
+  21          //  {  
+  22          //    
+  23          //    TH1=0xFC;
+  24          //    TL1=0x19;
+  25          //    TF1=0;
+  26          //    TR1=1;
+  27          //    while(TF1==0);
+  28          //    TF1=0;
+  29          //    TR1=0;
+  30          //  }
+  31          //}
+  32          
+  33          //  
+  34          ///***********************************************************************/
+  35          // //LCD Write Function
+  36          //void LCD4_write ( unsigned char Value)
+  37          //  {  
+  38          //    //In this Case Byte are divide into two Nibbles,First low nibble is passed and then Highly Nibble is t
+             -ransfred
+  39          //    //Nibble are Anded(Gate) with pins with below mentioned Value(By making each pin High) One by one
+  40          //    
+  41          //    DB4=0x10 & Value;            //Value (Command Or Data are and with 0x10) first Pin          
+  42          //    DB5=0x20 & Value;            //Value (Command Or Data are and with 0x20) second Pin  
+  43          //    DB6=0x40 & Value;            //Value (Command Or Data are and with 0x40) Third Pin  
+  44          //    DB7=0x80 & Value;            //Value (Command Or Data are and with 0x80) Fourth Pin  
+  45          //                    //First Nibble Ready 
+  46          //    EN=1;                       //Enable High...
+  47          //    Delay(4);                   //for 450ns to latch Data/Command and
+  48          //    EN=0;                       //then make it low
+  49          //   
+  50          //  }
+  51          //  
+  52          ///***********************************************************************/
+  53          //// LCD Command Function
+C51 COMPILER V9.60.7.0   LCD                                                               09/24/2024 15:22:31 PAGE 2   
+
+  54          //void LCD_Command (unsigned char cmd)
+  55          //{ 
+  56          //  RS=0;                           //for command RS=0
+  57          //  RW=0;                           //for command RW=0
+  58          //  LCD4_write(cmd & 0xF0);         // First nibble Passed
+  59          //  LCD4_write( cmd <<4 );          //Shift first Nibble and Next will be Ready to pass
+  60          //}
+  61          
+  62          ///***********************************************************************/
+  63          //// LCD Data Functio
+  64          //void LCD_Data (unsigned char Data)
+  65          //{ 
+  66          //  RS=1;                          //for Data RS=1
+  67          //  RW=0;                          //for Data RS=1
+  68          //  LCD4_write ( Data & 0xF0);
+  69          //  LCD4_write (Data <<4 );
+  70          //  
+  71          //}
+  72          
+  73          ///***********************************************************************/
+  74          //// To Enter String
+  75          //void String_data (unsigned char *p)                //Pointer is used to passs the string to LCD
+  76          //{
+  77          //  
+  78          //  while(*p)                                        // P is a pointer which store the address of variable 
+             -And *p show the value of pointer
+  79          //  {
+  80          //    LCD_Data(*p++);                               //Passing the Charchater one by one to LCD data Port
+  81          //  }
+  82          
+  83          //}
+  84          ///***********************************************************************/
+  85          //// Intilization OF LCD
+  86          //void LCD_Intialization(void)
+  87          //{  
+  88          //                                           
+  89          //   Delay(100);
+  90          //   LCD_Command(0x02);  //initilize the LCD in 4bit Mode
+  91          //   LCD_Command(0x28);
+  92          //   LCD_Command(0x0C);  // display ON cursor ON
+  93          //   LCD_Command(0x01);  // clear the LCD
+  94          //   LCD_Command(0x80);  // move the Cursor to First line First Position
+  95          //}
+  96          
+  97          ///***********************************************************************/
+  98          //// Set Cursor function (Enter the coloum and Row, the Cursor position is on that point)
+  99          
+ 100          // void Set_cursor(int row, int coloum)
+ 101          // {      
+ 102          //   if(row==1)                                          //Row 1
+ 103          //      {   LCD_Command(0x80+coloum); }                  //0x80(First Row first Display) + Desired Number of
+             - coloum position
+ 104          //      else if(row==2)                                  //Row 2
+ 105          //      {   LCD_Command(0xC0+coloum); }                  //0xC0(sercond Row first Display + Desired Number o
+             -f coloum position)
+ 106          // 
+ 107          // 
+ 108          // }
+ 109          
+ 110          
+ 111          // 
+ 112          // /***********************************************************************/
+C51 COMPILER V9.60.7.0   LCD                                                               09/24/2024 15:22:31 PAGE 3   
+
+ 113          // int lcd_Pow(int X,int Y)
+ 114          //{
+ 115          //  unsigned char i;
+ 116          //  int Result=1;
+ 117          //  for(i=0;i<Y;i++)
+ 118          //  {
+ 119          //    Result*=X;
+ 120          //  }
+ 121          //  return Result;
+ 122          //}
+ 123          
+ 124          ///**************************************************************************/
+ 125          
+ 126          ////***  TO change Integer Data Type into Charchater Data Type**
+ 127          ////Set Cursor, Passing Number and its Length,
+ 128          //void LCD_ShowNum(unsigned char Line,unsigned char Column,unsigned int Number,unsigned char Length)
+ 129          //{
+ 130          //  unsigned char i;
+ 131          //  Set_cursor(Line,Column);                     //Set cursor
+ 132          //  for(i=Length;i>0;i--)                        //set the length, if Number is 1 and its lenght is 3, so o
+             -n LCD Output is 001
+ 133          //  {
+ 134          //    LCD_Data(Number/lcd_Pow(10,i-1)%10+'0');   //take the modulos and convert into charachter 
+ 135          //  }
+ 136          //}
+ 137          
+ 138          ///*****************************************************************************************/
+ 139          //void LCD_ShowChar(unsigned char Line,unsigned char Column,unsigned char Char)
+ 140          //{
+ 141          //  Set_cursor(Line,Column);
+ 142          //  LCD_Data(Char);
+ 143          //}
+ 144          
+ 145          ///****************************************************************************************/
+ 146          
+ 147          //void LCD_ShowString(unsigned char Line,unsigned char Column,char *String)  /// show string on lcd
+ 148          //{
+ 149          //  unsigned char i;
+ 150          //  Set_cursor(Line,Column);
+ 151          //  for(i=0;String[i]!='\0';i++)
+ 152          //  {
+ 153          //    LCD_Data(String[i]);
+ 154          //  }
+ 155          //}
+ 156          
+ 157          //void LCD_ShowFloat(float num, int decimalPlaces) 
+ 158          //{ 
+ 159          //  int intValue,factor,i,decimalInt,digit; 
+ 160          //  float decimalPart;
+ 161          //     
+ 162          //    
+ 163          //    intValue = (int)num;
+ 164          //     decimalPart = num - intValue;
+ 165          
+ 166          //    // Display the integer part
+ 167          //    LCD_ShowNum(1, 12, intValue, 1);
+ 168          
+ 169          //    // Display the decimal point
+ 170          //    LCD_ShowChar(1, decimalPlaces+12 , '.');
+ 171          
+ 172          //    // Calculate the factor to convert decimal part to an integer
+ 173          //     factor = 1;
+C51 COMPILER V9.60.7.0   LCD                                                               09/24/2024 15:22:31 PAGE 4   
+
+ 174          //    for ( i = 0; i < decimalPlaces; i++) {
+ 175          //        factor *= 10;
+ 176          //    }
+ 177          
+ 178          //    // Convert the decimal part to an integer
+ 179          //     decimalInt = (int)(decimalPart * factor);
+ 180          
+ 181          //    // Display the decimal part
+ 182          //    for ( i = decimalPlaces; i > 0; i--) {
+ 183          //         digit = decimalInt % 10;
+ 184          //        LCD_ShowNum(1, decimalPlaces + 12+i , digit, 1);
+ 185          //        decimalInt /= 10;
+ 186          //    }
+ 187          //    
+ 188          //    
+ 189          //    
+ 190          //    
+ 191          //    
+ 192          //    
+ 193          //    
+ 194          //    
+ 195          //    
+ 196          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

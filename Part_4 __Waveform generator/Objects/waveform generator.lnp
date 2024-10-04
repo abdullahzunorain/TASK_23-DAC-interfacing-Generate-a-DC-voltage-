@@ -1,0 +1,4 @@
+".\Objects\ADC.obj",
+".\Objects\lcd.obj" 
+TO ".\Objects\waveform generator" 
+PRINT(".\Listings\waveform generator.m51") RAMSIZE(256) 

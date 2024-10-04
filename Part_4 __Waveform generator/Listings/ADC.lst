@@ -1,0 +1,137 @@
+C51 COMPILER V9.60.7.0   ADC                                                               09/24/2024 15:22:31 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE ADC
+OBJECT MODULE PLACED IN .\Objects\ADC.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ADC.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\ADC.l
+                    -st) TABS(2) OBJECT(.\Objects\ADC.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include <math.h>
+   3          
+   4          unsigned int  i;
+   5          sbit PWM_PIN = P2^1;
+   6          
+   7          unsigned int ON_Period, OFF_Period;
+   8          unsigned int index = 0;
+   9          
+  10          unsigned int sine_wave[49] = {0x80,0x90,0xA1,0xB1,0xC0,0xCD,0xDA,0xE5,0xEE,0xF6,0xFB,0xFE,0xFF, 
+  11                                        0xFE,0xFB,0xF6,0xEE,0xE5,0xDA,0xCD,0xC0,0xB1,0xA1,0x90,0x80,0x70,
+  12                                        0x80,0x5F,0x4F,0x40,0x33,0x26,0x1B,0x12,0x0A,0x05,0x02,0x00,0x02,
+  13                                        0x05, 0x0A,0x12,0x1B,0x26,0x33,0x40,0x4F,0x5F,0x80}; // Values for one cycle
+             - of the sine wave
+  14          
+  15          void Timer0_Init() {
+  16   1          TMOD = 0x02;  
+  17   1          TH0 = 0x00;   
+  18   1          IE = 0x82;
+  19   1      }
+  20          
+  21          void Timer0_ISR() interrupt 1 {
+  22   1          PWM_PIN = ~PWM_PIN;  // Toggle PWM_PIN
+  23   1      
+  24   1          if (PWM_PIN == 1) {
+  25   2              TH0 = ON_Period >> 8;   // Set ON period for PWM
+  26   2              TL0 = ON_Period;
+  27   2          } else {
+  28   2              TH0 = OFF_Period >> 8;  // Set OFF period for PWM
+  29   2              TL0 = OFF_Period;
+  30   2          }
+  31   1      }
+  32          
+  33          void Set_Duty_Cycle(unsigned char duty_cycle) {
+  34   1          unsigned int Period = 255;
+  35   1          ON_Period = ((Period / 100.0) * duty_cycle);
+  36   1          OFF_Period = Period - ON_Period;
+  37   1          ON_Period = 255 - ON_Period;
+  38   1          OFF_Period = 255 - OFF_Period;
+  39   1      }
+  40          
+  41          void main() {
+  42   1          Timer0_Init();  // Initialize Timer 0 for PWM generation
+  43   1      
+  44   1          while (1) {
+  45   2              for (index = 0; index < 49; index++) {
+  46   3                  Set_Duty_Cycle(sine_wave[index]);
+  47   3              }
+  48   2          }
+  49   1      }
+  50          
+  51          /* 
+  52          //Sawtooth Wave Form
+  53          #include <reg52.h>
+C51 COMPILER V9.60.7.0   ADC                                                               09/24/2024 15:22:31 PAGE 2   
+
+  54          #include <math.h>
+  55          #include "LCD.h"
+  56          
+  57          unsigned int i;
+  58          sbit PWM_PIN = P2^1;
+  59          
+  60          unsigned int ON_Period, OFF_Period;
+  61          unsigned int index = 0;
+  62          
+  63          unsigned int sawtooth_wave[50] = {0x00, 0x05, 0x0A, 0x0F, 0x14, 0x19, 0x1E, 0x23, 0x28, 0x2D, 0x32, 0x37, 
+             -0x3C, 0x41,
+  64                                            0x46, 0x4B, 0x50, 0x55, 0x5A, 0x5F, 0x64, 0x69, 0x6E, 0x73, 0x78, 0x7D, 
+             -0x82,
+  65                                            0x87, 0x8C, 0x91, 0x96, 0x9B, 0xA0, 0xA5, 0xAA, 0xAF, 0xB4, 0xB9, 0xBE, 
+             -0xC3,
+  66                                            0xC8, 0xCD, 0xD2, 0xD7, 0xDC, 0xE1, 0xE6, 0xEB, 0xF0, 0xF5}; // Values f
+             -or one cycle of the sawtooth wave
+  67          
+  68          void Timer0_Init() {
+  69              TMOD = 0x02;  // Timer 0, Mode 1: 16-bit timer with auto-reload
+  70              TH0 = 0x00;   // Initial timer value
+  71              TR0 = 1;
+  72              IE = 0x82;
+  73          }
+  74          
+  75          void Timer0_ISR() interrupt 1 {
+  76              PWM_PIN = ~PWM_PIN;  // Toggle PWM_PIN
+  77          
+  78              if (PWM_PIN == 1) {
+  79                  TH0 = ON_Period >> 8;   // Set ON period for PWM
+  80                  TL0 = ON_Period;
+  81              } else {
+  82                  TH0 = OFF_Period >> 8;  // Set OFF period for PWM
+  83                  TL0 = OFF_Period;
+  84              }
+  85          }
+  86          
+  87          void Set_Duty_Cycle(unsigned char duty_cycle) {
+  88              unsigned int Period = 255;
+  89              ON_Period = ((Period / 100.0) * duty_cycle);
+  90              OFF_Period = Period - ON_Period;
+  91              ON_Period = 255 - ON_Period;
+  92              OFF_Period = 255 - OFF_Period;
+  93          }
+  94          
+  95          void main() {
+  96              Timer0_Init();  // Initialize Timer 0 for PWM generation
+  97          
+  98              while (1) {
+  99                  for (index = 0; index < 50; index++) {
+ 100                      Set_Duty_Cycle(sawtooth_wave[index]);
+ 101                  }
+ 102              }
+ 103          }
+ 104          */
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    172    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   ADC                                                               09/24/2024 15:22:31 PAGE 3   
+
+   DATA SIZE        =    106       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

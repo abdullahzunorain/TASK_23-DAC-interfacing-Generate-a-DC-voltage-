@@ -1,0 +1,5 @@
+".\Objects\adc.obj",
+".\Objects\lcd.obj",
+".\Objects\main.obj" 
+TO ".\Objects\adv DC power supply" 
+PRINT(".\Listings\adv DC power supply.m51") RAMSIZE(256) 

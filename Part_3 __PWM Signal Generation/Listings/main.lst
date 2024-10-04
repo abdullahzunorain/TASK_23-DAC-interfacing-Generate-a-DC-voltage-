@@ -1,0 +1,321 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:45:19 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          # include <reg52.h>
+   2          # include "lcd.h"
+   3          # include "voltage.h"
+   4          
+   5          sbit PWM_PIN= P2^1;
+   6          unsigned int  ON_Period, OFF_Period;
+   7          unsigned int DutyCycle;
+   8          
+   9          // Keypad Button
+  10          sbit C1=P1^3;
+  11          sbit C2=P1^2;
+  12          sbit C3=P1^1;
+  13          sbit C4=P1^0;
+  14                                                                        
+  15          sbit R1=P1^7;
+  16          sbit R2=P1^6;
+  17          sbit R3=P1^5;
+  18          sbit R4=P1^4;
+  19          
+  20          
+  21          int Number[3];
+  22          unsigned char key[3];            
+  23          unsigned int k1;
+  24          unsigned int num;
+  25          unsigned char i ;
+  26          unsigned int Ent_num;
+  27          
+  28          //PWM Setup
+  29          void Timer0_Intilization ()
+  30          {
+  31   1        TMOD =0x01;
+  32   1        TH0=0xB7;
+  33   1        TL0=0xFD;
+  34   1        TR0=1;
+  35   1        IE=0x82;
+  36   1      
+  37   1      }
+  38          
+  39          void Timer0 () interrupt 1
+  40          { 
+  41   1        PWM_PIN = ~PWM_PIN ;  
+  42   1        if(PWM_PIN)
+  43   1           {
+  44   2             TH0=ON_Period >> 8;
+  45   2             TL0=ON_Period;
+  46   2           }
+  47   1           else
+  48   1           {
+  49   2             TH0=OFF_Period >> 8;
+  50   2             TL0=OFF_Period;
+  51   2           }  
+  52   1      }
+  53          
+  54          
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:45:19 PAGE 2   
+
+  55          
+  56          void Set_Duty_Cycle (float duty_cycle)
+  57          {  
+  58   1        unsigned int Period;
+  59   1        Period =65535 - 0xB7FD ;
+  60   1        ON_Period =((Period/100.0)*duty_cycle);
+  61   1        OFF_Period = Period -ON_Period;
+  62   1        ON_Period =  65535-ON_Period;
+  63   1        OFF_Period=  65535-OFF_Period;
+  64   1        
+  65   1      
+  66   1      }
+  67          
+  68          //Buzzer
+  69          void Beep(unsigned int duration)
+  70          {
+  71   1          unsigned char i,j;
+  72   1        
+  73   1        
+  74   1         for(i=0;i<duration;i++)            
+  75   1        {
+  76   2          R3=0;
+  77   2          for(j=0;j<100;j++);
+  78   2          R3=1;
+  79   2          for(j=0;j<100;j++);
+  80   2      
+  81   2      }
+  82   1      
+  83   1      }
+  84          // keypad 
+  85          char Key_Pressed ()                 
+  86          {  
+  87   1             
+  88   1      while(1)                             
+  89   1      { 
+  90   2        R1=0; R2=1; R3=1; R4=1;           
+  91   2             if(C1==0)                                        
+  92   2             {    while(C1==0)
+  93   3                 { Beep(250);  return '7';}
+  94   3                 
+  95   3             }  
+  96   2              
+  97   2             if(C2==0)                                       
+  98   2             {     while(C2==0)
+  99   3                   { Beep(250);return '8';}  
+ 100   3             }       
+ 101   2              
+ 102   2             if(C3==0)
+ 103   2             {   while(C3==0)
+ 104   3                { Beep(250);return '9';}  
+ 105   3             }
+ 106   2             
+ 107   2             if(C4==0)
+ 108   2             {   
+ 109   3                while(C4==0)
+ 110   3                { Beep(250);return '/';} 
+ 111   3             
+ 112   3             }
+ 113   2         
+ 114   2        R1=1; R2=0; R3=1; R4=1;                             
+ 115   2             if(C1==0)                                     
+ 116   2             { 
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:45:19 PAGE 3   
+
+ 117   3                 while(C1==0)
+ 118   3                { Beep(250);return '4';} 
+ 119   3      
+ 120   3      
+ 121   3             } 
+ 122   2              if(C2==0)
+ 123   2             {  
+ 124   3                 while(C2==0)
+ 125   3                { Beep(250);return '5';} 
+ 126   3             }
+ 127   2              if(C3==0)
+ 128   2             {  
+ 129   3               while(C3==0)
+ 130   3                { Beep(250);return '6';} 
+ 131   3      
+ 132   3             }
+ 133   2              if(C4==0)
+ 134   2             {  while(C4==0)
+ 135   3                { Beep(250);return '*';}   }
+ 136   2             
+ 137   2        R1=1; R2=1; R3=0; R4=1;                               
+ 138   2             if(C1==0)
+ 139   2             {  
+ 140   3               while(C1==0)
+ 141   3                { Beep(250);return '1';} 
+ 142   3      
+ 143   3             } 
+ 144   2              if(C2==0)
+ 145   2             {  while(C2==0)
+ 146   3                { Beep(250);return '2';} 
+ 147   3             }
+ 148   2              if(C3==0)
+ 149   2             {  while(C3==0)
+ 150   3                { Beep(250);return '3';}   
+ 151   3             }
+ 152   2              if(C4==0)
+ 153   2             {  while(C4==0)
+ 154   3                { Beep(250);return '-';}   }
+ 155   2             
+ 156   2             
+ 157   2        R1=1; R2=1; R3=1; R4=0;                               
+ 158   2             if(C1==0)
+ 159   2             { 
+ 160   3                  Delay(10);  
+ 161   3                  LCD_Command(0x01); 
+ 162   3                  Delay(10); 
+ 163   3      
+ 164   3                  LCD_Command(0x80);  
+ 165   3                  Delay(10);  
+ 166   3      
+ 167   3                  String_data("Duty Cycle");  
+ 168   3                  Delay(10);  
+ 169   3      
+ 170   3                  LCD_Command(0xC1);  
+ 171   3                  Delay(10); 
+ 172   3      
+ 173   3                  while (C1 == 0);
+ 174   3               
+ 175   3               
+ 176   3               } 
+ 177   2              if(C2==0)
+ 178   2             {  while(C2==0)
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:45:19 PAGE 4   
+
+ 179   3                { Beep(250);return '0';}  
+ 180   3             
+ 181   3             } 
+ 182   2              if(C3==0)
+ 183   2             {  while(C3==0)
+ 184   3                { Beep(250);return '=';}  
+ 185   3             }
+ 186   2              if(C4==0)
+ 187   2             { while(C4==0)
+ 188   3                { Beep(250);return '+';} 
+ 189   3             }
+ 190   2         
+ 191   2         R4=1;
+ 192   2      }
+ 193   1      
+ 194   1      }
+ 195          
+ 196          //Converting integer into char
+ 197          
+ 198          int Convert_char(unsigned char value)
+ 199          {
+ 200   1              
+ 201   1       switch(value)                   
+ 202   1       {
+ 203   2         case '0':                    
+ 204   2         { return 0; break;}
+ 205   2                                    
+ 206   2          case '1':
+ 207   2         { return 1; break;}
+ 208   2         
+ 209   2          case '2':
+ 210   2         { return 2; break;}
+ 211   2         
+ 212   2          case '3':
+ 213   2         { return 3; break;}
+ 214   2         
+ 215   2          case '4':
+ 216   2         { return 4; break;}
+ 217   2         
+ 218   2          case '5':
+ 219   2         { return 5; break;}
+ 220   2         
+ 221   2          case '6':
+ 222   2         { return 6; break;}
+ 223   2         
+ 224   2          case '7':
+ 225   2         { return 7; break;}
+ 226   2         
+ 227   2          case '8':
+ 228   2         { return 8; break;}
+ 229   2         
+ 230   2          case '9':
+ 231   2         { return 9; break;}
+ 232   2         
+ 233   2       }
+ 234   1      
+ 235   1      }
+ 236          
+ 237          void main (void)
+ 238          {   
+ 239   1          LCD_Intialization();                      
+ 240   1          String_data("Duty Cycle");
+C51 COMPILER V9.60.7.0   MAIN                                                              09/25/2024 12:45:19 PAGE 5   
+
+ 241   1          Timer0_Intilization ();                    
+ 242   1          R3=0;                                   
+ 243   1        
+ 244   1          while(1)
+ 245   1          {  
+ 246   2              Ent_num = 0;                        
+ 247   2             for(i=0;i<4;i++)
+ 248   2            { 
+ 249   3              key[i]= Key_Pressed ();                  
+ 250   3              k1=Convert_char(key[i]); 
+ 251   3              Number[i]=k1;
+ 252   3              LCD_ShowNum(2,1+i,Number[i],1);
+ 253   3              Ent_num++;
+ 254   3              
+ 255   3              if (key[i]=='+')                     //if the Button press charachter is '+' break from the for loop a
+             -nd the prevouis value is duty Cycle
+ 256   3                { Ent_num--;   break;  }
+ 257   3              
+ 258   3            }
+ 259   2         
+ 260   2            
+ 261   2             if (Ent_num > 0 || Ent_num <= 3)     
+ 262   2             {                                     
+ 263   3              if(Ent_num==1)     
+ 264   3                  {num=Number[0]; LCD_ShowNum(2,1,num,1); LCD_ShowString(2,2,".00");}
+ 265   3               else if(Ent_num==2)
+ 266   3                    {num=(Number[0]*10)+Number[1]; LCD_ShowNum(2,1,num,2); LCD_ShowString(2,3,".00");}
+ 267   3              else if(Ent_num==3)
+ 268   3                    {num=(Number[0]*100+Number[1]*10+Number[2]); LCD_ShowNum(2,1,num,3); LCD_ShowString(2,4,".00");
+             -}
+ 269   3             }
+ 270   2        
+ 271   2            
+ 272   2              if(num<=100  && num>=0 )              
+ 273   2              {                                 
+ 274   3                DutyCycle = num ; 
+ 275   3                Set_Duty_Cycle(DutyCycle);
+ 276   3                Delay(500);
+ 277   3              }     
+ 278   2              else                                 
+ 279   2              { 
+ 280   3                Set_cursor(2,1);
+ 281   3                String_data("Invalid Number");   // Print On LCD Invalid Number
+ 282   3              }
+ 283   2          
+ 284   2          }     
+ 285   1      }
+ 286          
+*** WARNING C291 IN LINE 235 OF main.c: not every exit path returns a value
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    921    ----
+   CONSTANT SIZE    =     30    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     22       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

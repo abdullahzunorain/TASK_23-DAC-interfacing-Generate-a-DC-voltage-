@@ -1,0 +1,173 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    09/24/2024  15:22:31  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\ADC.obj, .\Objects\lcd.obj TO .\Objects\waveform generator PRINT (.\Listings\wavef
+>> orm generator.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL WITH FLOATING POINT ARITHMETIC
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\ADC.obj (ADC)
+  .\Objects\lcd.obj (LCD)
+  C:\KEIL_V5\C51\LIB\C51FPS.LIB (?C?FPMUL)
+  C:\KEIL_V5\C51\LIB\C51FPS.LIB (?C?FPDIV)
+  C:\KEIL_V5\C51\LIB\C51FPS.LIB (?C?FCAST)
+  C:\KEIL_V5\C51\LIB\C51FPS.LIB (?C?CASTF)
+  C:\KEIL_V5\C51\LIB\C51FPS.LIB (?C?FPGETOPN)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?LNEG)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  .\Objects\waveform generator (ADC)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     006AH     UNIT         ?DT?ADC
+            DATA    0072H     0003H     UNIT         _DATA_GROUP_
+            IDATA   0075H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     0273H     UNIT         ?C?LIB_CODE
+            CODE    0281H     008CH     UNIT         ?C_C51STARTUP
+            CODE    030DH     006AH     UNIT         ?C_INITSEG
+            CODE    0377H     0060H     UNIT         ?PR?_SET_DUTY_CYCLE?ADC
+            CODE    03D7H     0028H     UNIT         ?PR?MAIN?ADC
+            CODE    03FFH     001AH     UNIT         ?PR?TIMER0_ISR?ADC
+            CODE    0419H     000AH     UNIT         ?PR?TIMER0_INIT?ADC
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\waveform generator (ADC)
+
+
+SEGMENT                           DATA_GROUP 
+  +--> CALLED SEGMENT           START    LENGTH
+-----------------------------------------------
+?C_C51STARTUP                   -----    -----
+  +--> ?PR?MAIN?ADC
+  +--> ?C_INITSEG
+
+?PR?MAIN?ADC                    -----    -----
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/24/2024  15:22:31  PAGE 2
+
+
+  +--> ?PR?TIMER0_INIT?ADC
+  +--> ?PR?_SET_DUTY_CYCLE?ADC
+
+?PR?_SET_DUTY_CYCLE?ADC         0072H    0003H
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\waveform generator (ADC)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ADC
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  C:03FFH         PUBLIC        Timer0_ISR
+  C:0377H         PUBLIC        _Set_Duty_Cycle
+  D:00A8H         PUBLIC        IE
+  D:00B8H         PUBLIC        IP
+  D:0008H         PUBLIC        index
+  D:000AH         PUBLIC        OFF_Period
+  C:03D7H         PUBLIC        main
+  C:0419H         PUBLIC        Timer0_Init
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  B:00A0H.1       PUBLIC        PWM_PIN
+  D:000CH         PUBLIC        sine_wave
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+  D:006EH         PUBLIC        ON_Period
+  D:00C8H         PUBLIC        T2CON
+  D:0070H         PUBLIC        i
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          TIMER0_INIT
+  C:0419H         LINE#         15
+  C:0419H         LINE#         16
+  C:041CH         LINE#         17
+  C:041FH         LINE#         18
+  C:0422H         LINE#         19
+  -------         ENDPROC       TIMER0_INIT
+  -------         PROC          TIMER0_ISR
+  C:03FFH         LINE#         21
+  C:0401H         LINE#         22
+  C:0403H         LINE#         24
+  C:0406H         LINE#         25
+  C:040AH         LINE#         26
+  C:040DH         LINE#         27
+  C:040FH         LINE#         28
+  C:0413H         LINE#         29
+  C:0416H         LINE#         30
+  C:0416H         LINE#         31
+  -------         ENDPROC       TIMER0_ISR
+  -------         PROC          _SET_DUTY_CYCLE
+  D:0072H         SYMBOL        duty_cycle
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  09/24/2024  15:22:31  PAGE 3
+
+
+  -------         DO            
+  D:0073H         SYMBOL        Period
+  -------         ENDDO         
+  C:0377H         LINE#         33
+  C:0379H         LINE#         34
+  C:037FH         LINE#         35
+  C:03B1H         LINE#         36
+  C:03BEH         LINE#         37
+  C:03CAH         LINE#         38
+  C:03D6H         LINE#         39
+  -------         ENDPROC       _SET_DUTY_CYCLE
+  -------         PROC          MAIN
+  C:03D7H         LINE#         41
+  C:03D7H         LINE#         42
+  C:03DAH         LINE#         44
+  C:03DAH         LINE#         45
+  C:03DFH         LINE#         46
+  C:03ECH         LINE#         47
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        ADC
+
+  -------         MODULE        LCD
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  -------         ENDMOD        LCD
+
+  -------         MODULE        ?C?FPMUL
+  C:000EH         PUBLIC        ?C?FPMUL
+  -------         ENDMOD        ?C?FPMUL
+
+  -------         MODULE        ?C?FPDIV
+  C:0117H         PUBLIC        ?C?FPDIV
+  -------         ENDMOD        ?C?FPDIV
+
+  -------         MODULE        ?C?FCAST
+  C:01BEH         PUBLIC        ?C?FCASTC
+  C:01B9H         PUBLIC        ?C?FCASTI
+  C:01B4H         PUBLIC        ?C?FCASTL
+  -------         ENDMOD        ?C?FCAST
+
+  -------         MODULE        ?C?CASTF
+  C:01F2H         PUBLIC        ?C?CASTF
+  -------         ENDMOD        ?C?CASTF
+
+  -------         MODULE        ?C?LNEG
+  C:0273H         PUBLIC        ?C?LNEG
+  -------         ENDMOD        ?C?LNEG
+
+Program Size: data=118.0 xdata=0 code=1051
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

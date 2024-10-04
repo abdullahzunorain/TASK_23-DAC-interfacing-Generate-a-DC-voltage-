@@ -1,0 +1,5 @@
+".\Objects\lcd.obj",
+".\Objects\main.obj",
+".\Objects\voltage.obj" 
+TO ".\Objects\PWM signal generation" 
+PRINT(".\Listings\PWM signal generation.m51") RAMSIZE(256) 

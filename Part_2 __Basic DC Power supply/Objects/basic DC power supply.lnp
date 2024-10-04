@@ -1,0 +1,6 @@
+".\Objects\ADC.obj",
+".\Objects\key.obj",
+".\Objects\lcd.obj",
+".\Objects\main.obj" 
+TO ".\Objects\basic DC power supply" 
+PRINT(".\Listings\basic DC power supply.m51") RAMSIZE(256) 
