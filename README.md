@@ -1,5 +1,7 @@
 ## Task 23: DAC Interfacing (Generating a DC Voltage Using PWM)
 
+![](DAC.jpg)
+
 #### Overview
 This task involves generating a DC voltage using PWM and converting it through a low-pass filter circuit based on the **LM358** operational amplifier, which is present in the STC development kit. The PWM signal (0-100% duty cycle) on pin **P21** will be converted into a 0-5V DC voltage.
 
